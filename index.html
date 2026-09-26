@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Skalarprodukt zweier Vektoren</title>
+<style>
+  :root {
+    --bg: #121214;
+    --panel: #1c1c1f;
+    --border: #333338;
+    --text: #f0f0f0;
+    --text-muted: #9a9aa2;
+    --a-color: #7CFC9A;
+    --b-color: #FF9E4A;
+    --bp-color: #FF7AC6;
+    --dot-color: #B18CFF;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    padding: 2rem 1rem;
+  }
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 0.25rem;
+  }
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin: 0 0 1.5rem;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  @media (max-width: 720px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+  }
+  .panel h2 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dot-legend {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .slider-row label {
+    font-size: 13px;
+    width: 20px;
+    color: var(--text-muted);
+  }
+  input[type="range"] {
+    flex: 1;
+    accent-color: var(--a-color);
+    height: 4px;
+  }
+  .slider-row.b-slider input[type="range"] {
+    accent-color: var(--b-color);
+  }
+  .slider-out {
+    font-size: 13px;
+    min-width: 32px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  svg {
+    width: 100%;
+    height: 380px;
+    display: block;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-size: 13px;
+    margin-top: 0.75rem;
+    color: var(--text-muted);
+  }
+  .legend span.dot-legend {
+    margin-right: 6px;
+    vertical-align: -1px;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 1rem;
+  }
+  .stat-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .stat-value {
+    font-size: 20px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .formula-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-top: 1.5rem;
+    font-size: 14px;
+    line-height: 1.9;
+  }
+  .formula-box code {
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 13px;
+  }
+  .rel-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Skalarprodukt zweier Vektoren</h1>
+  <p class="subtitle">Verschiebe a und b und beobachte die Projektion b' sowie das Skalarprodukt.</p>
+
+  <div class="layout">
+    <div class="panel">
+      <h2><span class="dot-legend" style="background:var(--a-color)"></span>Vektor a</h2>
+      <div class="slider-row">
+        <label>ax</label>
+        <input type="range" min="-5" max="5" step="0.5" value="4" id="ax">
+        <span class="slider-out" id="ax-out">4</span>
+      </div>
+      <div class="slider-row">
+        <label>ay</label>
+        <input type="range" min="-5" max="5" step="0.5" value="1" id="ay">
+        <span class="slider-out" id="ay-out">1</span>
+      </div>
+
+      <h2 style="margin-top:1.25rem"><span class="dot-legend" style="background:var(--b-color)"></span>Vektor b</h2>
+      <div class="slider-row b-slider">
+        <label>bx</label>
+        <input type="range" min="-5" max="5" step="0.5" value="2" id="bx">
+        <span class="slider-out" id="bx-out">2</span>
+      </div>
+      <div class="slider-row b-slider">
+        <label>by</label>
+        <input type="range" min="-5" max="5" step="0.5" value="3" id="by">
+        <span class="slider-out" id="by-out">3</span>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">|a|</div>
+          <div class="stat-value" id="magA-out">4.12</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">|b|</div>
+          <div class="stat-value" id="magB-out">3.61</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label" style="color:var(--bp-color)">|b'| (Projektion)</div>
+          <div class="stat-value" id="proj-out" style="color:var(--bp-color)">2.18</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Winkel φ</div>
+          <div class="stat-value" id="angle-out">32.5°</div>
+        </div>
+      </div>
+
+      <div class="stat-card" style="margin-top:12px; background:var(--panel); border-color: var(--dot-color);">
+        <div class="stat-label" style="color:var(--dot-color)">a · b (Skalarprodukt)</div>
+        <div class="stat-value" id="dot-out" style="color:var(--dot-color); font-size:26px;">8.98</div>
+        <div style="margin-top:6px;"><span class="rel-badge" id="rel-badge">spitzer Winkel</span></div>
+      </div>
+
+      <div class="formula-box">
+        <div><code>a · b = a<sub>x</sub>b<sub>x</sub> + a<sub>y</sub>b<sub>y</sub></code></div>
+        <div><code>a · b = |a| · |b| · cos(φ)</code></div>
+        <div><code>b' = ((a · b) / |a|²) · a</code></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Grafische Darstellung</h2>
+      <svg id="plot" viewBox="0 0 400 380"></svg>
+      <div class="legend">
+        <div><span class="dot-legend" style="background:var(--a-color)"></span>a (Basis)</div>
+        <div><span class="dot-legend" style="background:var(--b-color)"></span>b</div>
+        <div><span class="dot-legend" style="background:var(--bp-color)"></span>b' (Projektion)</div>
+        <div><span class="dot-legend" style="background:var(--dot-color)"></span>Fläche = Skalarprodukt</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const cx = 200, cy = 280, scale = 24;
+['ax','ay','bx','by'].forEach(id => {
+  document.getElementById(id).addEventListener('input', draw);
+});
+
+function toPx(x, y) { return [cx + x*scale, cy - y*scale]; }
+
+function draw() {
+  const ax = parseFloat(document.getElementById('ax').value);
+  const ay = parseFloat(document.getElementById('ay').value);
+  const bx = parseFloat(document.getElementById('bx').value);
+  const by = parseFloat(document.getElementById('by').value);
+
+  document.getElementById('ax-out').textContent = ax;
+  document.getElementById('ay-out').textContent = ay;
+  document.getElementById('bx-out').textContent = bx;
+  document.getElementById('by-out').textContent = by;
+
+  const magA = Math.sqrt(ax*ax + ay*ay);
+  const magB = Math.sqrt(bx*bx + by*by);
+  const dot = ax*bx + ay*by;
+
+  let projLen = 0, angleDeg = 0;
+  if (magA > 0) projLen = dot / magA;
+  if (magA > 0 && magB > 0) {
+    let cosT = dot / (magA*magB);
+    cosT = Math.max(-1, Math.min(1, cosT));
+    angleDeg = Math.acos(cosT) * 180 / Math.PI;
+  }
+
+  document.getElementById('magA-out').textContent = Math.round(magA*100)/100;
+  document.getElementById('magB-out').textContent = Math.round(magB*100)/100;
+  document.getElementById('proj-out').textContent = Math.round(projLen*100)/100;
+  document.getElementById('dot-out').textContent = Math.round(dot*100)/100;
+  document.getElementById('angle-out').textContent = (magA>0 && magB>0) ? (Math.round(angleDeg*10)/10)+'°' : '—';
+
+  const relBadge = document.getElementById('rel-badge');
+  if (Math.abs(dot) < 0.01) {
+    relBadge.textContent = 'senkrecht (⊥)';
+    relBadge.style.background = 'rgba(177,140,255,0.2)';
+    relBadge.style.color = 'var(--dot-color)';
+  } else if (dot < 0) {
+    relBadge.textContent = 'stumpfer Winkel';
+    relBadge.style.background = 'rgba(255,122,198,0.2)';
+    relBadge.style.color = 'var(--bp-color)';
+  } else {
+    relBadge.textContent = 'spitzer Winkel';
+    relBadge.style.background = 'rgba(124,252,154,0.2)';
+    relBadge.style.color = 'var(--a-color)';
+  }
+
+  const ux = magA > 0 ? ax/magA : 0;
+  const uy = magA > 0 ? ay/magA : 0;
+  const projX = ux * projLen;
+  const projY = uy * projLen;
+
+  const svgNS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById('plot');
+  svg.innerHTML = '';
+
+  for (let i=-6;i<=6;i++){
+    const [x1,y1]=toPx(i,-6), [x2,y2]=toPx(i,6);
+    const l=document.createElementNS(svgNS,'line');
+    l.setAttribute('x1',x1);l.setAttribute('y1',y1);l.setAttribute('x2',x2);l.setAttribute('y2',y2);
+    l.setAttribute('stroke','#2a2a2e');l.setAttribute('stroke-width','0.5');svg.appendChild(l);
+    const [x3,y3]=toPx(-6,i), [x4,y4]=toPx(6,i);
+    const l2=document.createElementNS(svgNS,'line');
+    l2.setAttribute('x1',x3);l2.setAttribute('y1',y3);l2.setAttribute('x2',x4);l2.setAttribute('y2',y4);
+    l2.setAttribute('stroke','#2a2a2e');l2.setAttribute('stroke-width','0.5');svg.appendChild(l2);
+  }
+  const [ox,oy]=toPx(0,0);
+  const xa=document.createElementNS(svgNS,'line');
+  xa.setAttribute('x1',toPx(-6,0)[0]);xa.setAttribute('y1',oy);xa.setAttribute('x2',toPx(6,0)[0]);xa.setAttribute('y2',oy);
+  xa.setAttribute('stroke','#4a4a50');xa.setAttribute('stroke-width','1');svg.appendChild(xa);
+  const ya=document.createElementNS(svgNS,'line');
+  ya.setAttribute('x1',ox);ya.setAttribute('y1',toPx(0,-6)[1]);ya.setAttribute('x2',ox);ya.setAttribute('y2',toPx(0,6)[1]);
+  ya.setAttribute('stroke','#4a4a50');ya.setAttribute('stroke-width','1');svg.appendChild(ya);
+
+  if (Math.abs(dot) > 0.001 && magA > 0) {
+    const [rx1,ry1] = toPx(0,0);
+    const [rx2,ry2] = toPx(projX, projY);
+    const [rx3,ry3] = toPx(bx, by);
+    const rect = document.createElementNS(svgNS,'polygon');
+    rect.setAttribute('points', `${rx1},${ry1} ${rx2},${ry2} ${rx3},${ry3} ${rx3-(rx2-rx1)},${ry3-(ry2-ry1)}`);
+    rect.setAttribute('fill', '#B18CFF');
+    rect.setAttribute('fill-opacity', '0.18');
+    rect.setAttribute('stroke', '#B18CFF');
+    rect.setAttribute('stroke-width', '1');
+    rect.setAttribute('stroke-dasharray', '3,3');
+    svg.appendChild(rect);
+  }
+
+  function arrow(vx, vy, color, label, fromX=0, fromY=0) {
+    const [x1,y1] = toPx(fromX, fromY);
+    const [x2,y2] = toPx(fromX+vx, fromY+vy);
+    const line=document.createElementNS(svgNS,'line');
+    line.setAttribute('x1',x1);line.setAttribute('y1',y1);line.setAttribute('x2',x2);line.setAttribute('y2',y2);
+    line.setAttribute('stroke',color);line.setAttribute('stroke-width','2.5');svg.appendChild(line);
+    const angle=Math.atan2(y1-y2,x2-x1);
+    const a1=angle+Math.PI-0.35, a2=angle+Math.PI+0.35;
+    const p1x=x2+10*Math.cos(a1), p1y=y2-10*Math.sin(a1);
+    const p2x=x2+10*Math.cos(a2), p2y=y2-10*Math.sin(a2);
+    const poly=document.createElementNS(svgNS,'polygon');
+    poly.setAttribute('points',`${x2},${y2} ${p1x},${p1y} ${p2x},${p2y}`);
+    poly.setAttribute('fill',color);svg.appendChild(poly);
+    const text=document.createElementNS(svgNS,'text');
+    text.setAttribute('x', x2 + (vx>=0?8:-8));
+    text.setAttribute('y', y2 + (vy>=0?-4:12));
+    text.setAttribute('font-size','13');
+    text.setAttribute('font-weight','600');
+    text.setAttribute('fill',color);
+    text.setAttribute('text-anchor', vx>=0?'start':'end');
+    text.textContent=label;svg.appendChild(text);
+  }
+
+  const [lx1,ly1] = toPx(projX, projY);
+  const [lx2,ly2] = toPx(bx, by);
+  const lot=document.createElementNS(svgNS,'line');
+  lot.setAttribute('x1',lx1);lot.setAttribute('y1',ly1);lot.setAttribute('x2',lx2);lot.setAttribute('y2',ly2);
+  lot.setAttribute('stroke', '#9a9aa2');
+  lot.setAttribute('stroke-width','1.5');
+  lot.setAttribute('stroke-dasharray','4,4');
+  svg.appendChild(lot);
+
+  arrow(ax, ay, '#7CFC9A', 'a');
+  arrow(bx, by, '#FF9E4A', 'b');
+  if (Math.abs(projLen) > 0.01) arrow(projX, projY, '#FF7AC6', "b'");
+}
+
+draw();
+</script>
+</body>
+</html>
